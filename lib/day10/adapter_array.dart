@@ -18,127 +18,112 @@ registerJolt(String line) {
 
 List<int> diffThreeAlways = [];
 List<int> diffOneAlways = [];
-List<int> positionEndOfGroups = [];
-int counter = 0;
-int valid = 0;
+int valid = 1;
 
-is_valid_increment(String counter) {
-  // build trythis from all of diffthree, and 1's from counter....
-  List<int> tryThis = List.from(diffThreeAlways);
-  for (var i = 0; i < counter.length; i++) {
-    if (counter[i] == '1') {
-      // print('Set: $i + value:${diffOneAlways[i]}');
-      tryThis.add(diffOneAlways[i]);
-    }
-  }
-  tryThis.sort();
-  // print('looking at: $tryThis');
-  var current = 0;
-  var isValid = true;
-  for (final element in tryThis) {
-    if (element - current > 3) {
-      isValid = false;
+List<int> values_between(startValue, endValue) {
+  List<int> returnValue = [];
+  for (final value in jolts) {
+    if ((value > startValue) && (value < endValue)) {
+      returnValue.add(value);
+    } else if (value == endValue) {
       break;
     }
-    current = element;
   }
-  ;
-  if (isValid) {
-    valid += 1;
-  }
+  return returnValue;
 }
 
-String bumpByOnes(String rawCounter) {
-  List<String> revisions = [];
-  revisions.add(rawCounter);
-  positionEndOfGroups.forEach((element) {
-    if (revisions.last.substring(element - 2, element + 1) == '000') {
-      revisions.add(revisions.last.substring(0, element - 2) +
-          '001' +
-          revisions.last.substring(element + 1));
-      print(revisions.last);
+bool validList(List list) {
+  // start + on items + end --> changes are 3 or less
+  var valid = true;
+  var currentValue = list[0];
+  for (var i = 1; i < list.length; i++) {
+    if ((list[i] - currentValue) > 3) {
+      valid = false;
+      break;
     }
-  });
-
-  return revisions.last;
+    currentValue = list[i];
+  }
+  print('valid:$valid');
+  return valid;
 }
 
-void constructPositionEndOfGroups() {
-  positionEndOfGroups = [
-    4,
-    10,
-    13,
-    16,
-    19,
-    24,
-    29,
-    34,
-    38,
-    41,
-    45,
-    48,
-    51,
-    55,
-    61,
-    65,
-    68
-  ];
-  // jolts contains all the numbers.... needs to be three 1's in a row...
-//6, 7, 8 reset count to zero
-  //if it jumps more than 1 clear count
-  //13, 14, 15
-  //position in jolts.
-  // diffOneAlways = [1,2,6,7,8,9,13,14,15,16];
-  // jolts = [1,2,5,6,7,8,9,13,14,15,16];
-  // var countTogether = 0;
-  // var lastElement = 0;
-  // // var currentIndex = 1;
-  // diffOneAlways.forEach((element) {
-  //   if (element - lastElement == 1) {
-  //     countTogether += 1;
-  //     if (countTogether == 3) {
-  //       countTogether = 0;
-  //       positionEndOfGroups.add(jolts.indexOf(element) - 1);
-  //     }
-  //   } else {
-  //     countTogether = 1;
-  //   }
-  //   lastElement = element;
-  // });
-  // print('diffOneAlways: $diffOneAlways');
-  // print('endOfGroups: $positionEndOfGroups : length_jolt: ${jolts.length}');
-  // positionEndOfGroups.forEach((element) {
-  //   print('end group number: ${jolts[element]}');
-  // });
+String calculateStringCounter(counter, valuesBetween) {
+  var short_string = counter.toRadixString(2);
+  String counter_string =
+      '0' * (valuesBetween.length - short_string.length) + short_string;
+  return counter_string;
 }
 
-// 1, 2, or 3 lower than value....
+int validPossibilities(start_value, end_value, List valuesBetween) {
+  var counter = 0;
+  var validOnes = 0;
+
+  if (valuesBetween.length == 0) {
+    return 1;
+  }
+  // use a counter that is the length of valuesbetween, turn on and off the values put start and end to the end.....
+
+  while (true) {
+    List<int> check_this = [start_value];
+    var counterString = calculateStringCounter(counter, valuesBetween);
+
+    print('counter:$counterString');
+
+    for (int i = 0; i < counterString.length; i++) {
+      if (counterString[i] == '1') {
+        check_this.add(valuesBetween[i]);
+      }
+    }
+    check_this.add(end_value);
+    print('trying: $check_this');
+    if (validList(check_this)) {
+      validOnes += 1;
+    }
+
+    if (calculateStringCounter(counter, valuesBetween) ==
+        '1' * valuesBetween.length) {
+      break;
+    }
+
+    counter += 1;
+  }
+  return validOnes;
+}
+
 int all_answer_count() {
-  jolts.add(largest_jolt + 3);
-  jolts.sort();
-
   // new way to solve....
-  // need to count only where the 1's are....
-  // also at least of each group of 1's will need to be 1....
-
-  // construct positionEndOfGroups contains position of each group
-  // walk jolts, identify three in a row of 1's that are not three's....
-  constructPositionEndOfGroups();
 
   // build counterString then bump by 1's (groups must be 1)
-  var counterString = bumpByOnes('0' * diffOneAlways.length);
-  print('length of counter bits: ${counterString.length}');
 
-  counter = int.parse(counterString, radix: 2);
-  print('position: 1=> ${jolts.indexOf(1)}');
-  print('position: 2=> ${jolts.indexOf(2)}');
-  print(
-      'end of groups => [${diffOneAlways.indexOf(8)},${diffOneAlways.indexOf(20)},${diffOneAlways.indexOf(29)},${diffOneAlways.indexOf(35)},${diffOneAlways.indexOf(41)},${diffOneAlways.indexOf(55)},${diffOneAlways.indexOf(66)},${diffOneAlways.indexOf(77)},${diffOneAlways.indexOf(87)},${diffOneAlways.indexOf(93)},${diffOneAlways.indexOf(100)},${diffOneAlways.indexOf(106)},${diffOneAlways.indexOf(112)},${diffOneAlways.indexOf(119)},${diffOneAlways.indexOf(131)},${diffOneAlways.indexOf(141)},${diffOneAlways.indexOf(150)}]');
+  print('length: ${diffThreeAlways.length} diff3:${diffThreeAlways}');
+  print('length: ${diffOneAlways.length} diff1:${diffOneAlways}');
+  print('length:${jolts.length} jolts:$jolts');
 
-  print('CounterString: $counterString : int counter: $counter');
-  //counter = // update the counter variable to match the new counter
+  // multiply valid by each count....
+  var current_position_start = 0;
+  var start_value = 0;
+  var end_value = diffThreeAlways[current_position_start];
 
-  // print('length:${jolts.length}');
+  while (current_position_start < diffThreeAlways.length) {
+    // find ways to get from start value to end value....
+    List<int> valuesBetween = values_between(start_value, end_value);
+    // if no values continue on....
+    if (valuesBetween == []) {
+      // nop for now... going to proceed after calculating new start and end...
+    } else {
+      // calculate how many possibilities....
+      valid *= validPossibilities(start_value, end_value, valuesBetween);
+      print(
+          'start: $start_value : values are: $valuesBetween : end: $end_value : current_possibilities: $valid');
+    }
+    // advance on
+    start_value = end_value;
+    current_position_start++;
+    if (current_position_start < diffThreeAlways.length) {
+      end_value = diffThreeAlways[current_position_start];
+    }
+  }
+
   // var counterString = '0' * diffOneAlways.length;
   // print(counterString);
   // call the function for all zero....
@@ -160,7 +145,6 @@ int all_answer_count() {
 int answer() {
   // need to add one that is 3 above highest
   jolts.add(largest_jolt + 3);
-  diffThreeAlways.add(largest_jolt + 3);
   jolts.sort();
 
   print(jolts);
