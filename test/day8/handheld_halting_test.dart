@@ -3,6 +3,12 @@ import 'package:passport_app/day8/handheld_halting.dart';
 
 void main() {
   test("example", () {
+    accumulator = 0;
+    runningIndex = 0;
+    linesRun = [];
+    program = [];
+    linesToReplace = [];
+    repeated = false;
     parse("nop +0");
     parse("acc +1");
     parse("jmp +4");
@@ -15,6 +21,12 @@ void main() {
     expect(run_accumulator_before_repeat(), 5);
   });
   test("part2", () {
+    accumulator = 0;
+    runningIndex = 0;
+    linesRun = [];
+    program = [];
+    linesToReplace = [];
+    repeated = false;
     parse("nop +0");
     parse("acc +1");
     parse("jmp +4");

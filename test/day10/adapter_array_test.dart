@@ -3,6 +3,9 @@ import 'package:passport_app/day10/adapter_array.dart';
 
 void main() {
   test("example1", () {
+    jolts = [];
+    diffThreeAlways = [];
+    diffOneAlways = [];
     registerJolt('16');
     registerJolt('10');
     registerJolt('15');
@@ -17,6 +20,9 @@ void main() {
     expect(answer(), 7 * 5);
   });
   test("example2", () {
+    jolts = [];
+    diffThreeAlways = [];
+    diffOneAlways = [];
     registerJolt('28');
     registerJolt('33');
     registerJolt('18');
@@ -52,6 +58,9 @@ void main() {
   });
 
   test("part 2 example1", () {
+    jolts = [];
+    diffThreeAlways = [];
+    diffOneAlways = [];
     registerJolt('16');
     registerJolt('10');
     registerJolt('15');
@@ -68,6 +77,11 @@ void main() {
   });
 
   test("part2 example2", () {
+    jolts = [];
+    diffThreeAlways = [];
+    diffOneAlways = [];
+    valid = 1;
+
     registerJolt('28');
     registerJolt('33');
     registerJolt('18');
