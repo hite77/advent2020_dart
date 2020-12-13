@@ -15,6 +15,29 @@ int direction = 0; // F goes direction....
 int x = 0;
 int y = 0;
 
+int waypoint_x = 10;
+int waypoint_y = 1;
+
+rotateWaypoint(String angle) {
+  var tempX;
+  var tempY;
+  if (angle == 'L180' || angle == 'R180') {
+    tempX = -waypoint_x;
+    tempY = -waypoint_y;
+  }
+  if (angle == 'L90' || angle == 'R270') {
+    tempX = -waypoint_y;
+    tempY = waypoint_x;
+  }
+  if (angle == 'R90' || angle == 'L270') {
+    //R90.  —> 10 units east and 4 units north. -->  To 4 units east and 10 units south of the shi
+    tempX = waypoint_y;
+    tempY = -waypoint_x;
+  }
+  waypoint_x = tempX;
+  waypoint_y = tempY;
+}
+
 addDirection(String line) {
   // N north distance...
   // S south, E east, W west, L left (90 degree increments)
@@ -23,48 +46,26 @@ addDirection(String line) {
   var count = int.parse(line.substring(1));
   if (line.startsWith('N')) {
     print('North: $count');
-    y = y + count;
+    waypoint_y += count;
   } else if (line.startsWith('S')) {
     print('South: $count');
-    y = y - count;
+    waypoint_y -= count;
   } else if (line.startsWith('E')) {
     print('East: $count');
-    x = x + count;
+    waypoint_x += count;
   } else if (line.startsWith('W')) {
     print('West: $count');
-    x = x - count;
+    waypoint_x -= count;
   } else if (line.startsWith('L')) {
     print('Left: $count');
-    direction = direction - count;
-    if (direction < 0) {
-      direction = direction + 360;
-    }
-    print('Direction: $direction');
+    rotateWaypoint(line);
   } else if (line.startsWith('R')) {
     print('Right: $count');
-    direction = direction + count;
-    if (direction >= 360) {
-      direction = direction - 360;
-    }
-    print('Direction: $direction');
+    rotateWaypoint(line);
   } else if (line.startsWith('F')) {
-    print('Forward: $count : direction: $direction');
-    // 0 east
-    // 90 south
-    // 180 west
-    // 270 north
-    var send = 'directions';
-    if (direction == 0) {
-      send = 'E$count';
-    } else if (direction == 90) {
-      send = 'S$count';
-    } else if (direction == 180) {
-      send = 'W$count';
-    } else if (direction == 270) {
-      send = 'N$count';
-    }
-    print(send);
-    addDirection(send);
+    print('Forward: $count');
+    x = x + waypoint_x * count;
+    y = y + waypoint_y * count;
   }
 }
 

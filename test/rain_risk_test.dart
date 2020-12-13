@@ -10,6 +10,6 @@ void main() {
     addDirection('F7');
     addDirection('R90');
     addDirection('F11');
-    expect(distance(), 25);
+    expect(distance(), 286); // 25 was original
   });
 }
