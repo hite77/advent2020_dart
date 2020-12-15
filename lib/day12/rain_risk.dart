@@ -74,7 +74,6 @@ int distance() {
   return x.abs() + y.abs();
 }
 
-//todo: can I integration test the whole thing?
 void main() async {
   print('adapter array');
   var file = File('data.txt');

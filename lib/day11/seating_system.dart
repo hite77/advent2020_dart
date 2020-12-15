@@ -103,7 +103,6 @@ int answer() {
   return answer;
 }
 
-//todo: can I integration test the whole thing?
 void main() async {
   print('adapter array');
   var file = File('data.txt');
