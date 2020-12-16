@@ -41,23 +41,24 @@ int differenceForBus(id) {
 int part2Answer() {
   var multiplier;
   // find biggest number column, and offset.... start at that number...
-  var biggest = 0;
-  var offset_biggest = 0;
-  for (var i = 0; i < part2Ids.length; i++) {
-    if (part2Ids[i] > offset_biggest) {
-      biggest = part2Ids[i];
-      offset_biggest = i;
-    }
-  }
+  var biggest = 9937;
+  // var offset_biggest = 0;
+  // for (var i = 0; i < part2Ids.length; i++) {
+  //   if (part2Ids[i] > offset_biggest) {
+  //     biggest = part2Ids[i];
+  //     offset_biggest = i;
+  //   }
+  // }
 
   //timestamp is the start.... if it is data value, set to huge start
   if (timestamp == 1000510) {
-    timestamp = 1895420000000000;
+    // // 1895431131329359 high....
+    timestamp = 1895300000000000;
     multiplier = (timestamp / biggest).floor();
-    timestamp = multiplier * biggest - offset_biggest;
+    timestamp = multiplier * biggest;
     print('Start timestamp: $timestamp');
   } else {
-    timestamp = biggest - offset_biggest;
+    timestamp = biggest;
     multiplier = 1;
   }
   print('timestamp: $timestamp : multiplier: $multiplier');
@@ -76,8 +77,8 @@ int part2Answer() {
         if ((arrivalTime - timestamp) == i) {
           found = true;
         } else {
-          multiplier += 1;
-          timestamp = multiplier * biggest - offset_biggest;
+          multiplier -= 1;
+          timestamp = multiplier * biggest;
           print('i: $i multiplier: $multiplier :trying timestamp: $timestamp ');
           found = false;
           break;

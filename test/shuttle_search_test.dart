@@ -10,18 +10,20 @@ void main() {
     expect(answer(), 295);
   });
 
-  test("chinese remainder", () {
-    readLine('17,13,19');
-    // readLine('');
-    print(12 % 7);
-    // readLine('x,x,6,5,7');
-    // print(158 % 5); // 158 is answer.
-    // print(158 % 6);
-    // print(158 % 7);
-    print('is this 3?:${42 % 5}');
-    // expect(1, 1);
-    expect(part2Answer(), 42);
-  });
+  // test("chinese remainder", () {
+  // readLine('17,13,19');
+  // readLine('');
+  // print(12 % 7);
+  // readLine('x,x,6,5,7');
+  // print(158 % 5); // 158 is answer.
+  // print(158 % 6);
+  // print(158 % 7);
+  // print('is this 3?:${42 % 5}');
+  // expect(1, 1);
+  // expect(part2Answer(), 42);
+  // });
+
+  // 210612924879242 --> full answer
 
   test("part 2 samples", () {
     readLine('7,13,x,x,59,x,31,19');
