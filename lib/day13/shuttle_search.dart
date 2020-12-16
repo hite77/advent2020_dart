@@ -38,56 +38,81 @@ int differenceForBus(id) {
   return ((timestamp / id).floor() + 1) * id - timestamp;
 }
 
-int part2Answer() {
-  var multiplier;
-  // find biggest number column, and offset.... start at that number...
-  var biggest = 9937;
-  // var offset_biggest = 0;
-  // for (var i = 0; i < part2Ids.length; i++) {
-  //   if (part2Ids[i] > offset_biggest) {
-  //     biggest = part2Ids[i];
-  //     offset_biggest = i;
-  //   }
-  // }
-
-  //timestamp is the start.... if it is data value, set to huge start
-  if (timestamp == 1000510) {
-    // // 1895431131329359 high....
-    timestamp = 1895300000000000;
-    multiplier = (timestamp / biggest).floor();
-    timestamp = multiplier * biggest;
-    print('Start timestamp: $timestamp');
-  } else {
-    timestamp = biggest;
-    multiplier = 1;
+int computeLeftover(int t, int modulus) {
+  if (t == 0) {
+    return 0;
   }
-  print('timestamp: $timestamp : multiplier: $multiplier');
+  var tryValue = 0;
+  while ((tryValue + t) % modulus != 0) {
+    tryValue += 1;
+  }
+  return tryValue;
+}
 
-  var found = false;
-  while (!found) {
-    for (var i = 0; i < part2Ids.length; i++) {
-      if (part2Ids[i] != -1) {
-        var trueValue = timestamp / part2Ids[i];
-        var arrivalTime;
-        if (trueValue == (timestamp / part2Ids[i]).floor()) {
-          arrivalTime = trueValue * part2Ids[i];
-        } else {
-          arrivalTime = (trueValue.floor() + 1) * part2Ids[i];
-        }
-        if ((arrivalTime - timestamp) == i) {
-          found = true;
-        } else {
-          multiplier -= 1;
-          timestamp = multiplier * biggest;
-          print('i: $i multiplier: $multiplier :trying timestamp: $timestamp ');
-          found = false;
-          break;
-        }
-      }
+int calculateU(int partModulus, int modulus) {
+  // 323u2 = 1 (mod 13) ==> u2 == 6
+  var tryValue = 0;
+  while ((partModulus * tryValue) % modulus != 1) {
+    tryValue += 1;
+  }
+  return tryValue;
+}
+
+int subtractModulus(sum, modulus) {
+  while (sum > modulus) {
+    sum -= modulus;
+  }
+  return sum;
+}
+
+int part2Answer() {
+  // need to get the modulus equations..... part2Ids is either number, or -1 for x
+  List<int> modulus = [];
+  List<int> leftover = [];
+  List<int> u = [];
+  List<int> partModulus = [];
+  int productModulus = 0;
+  //t is position.....
+  for (int t = 0; t < part2Ids.length; t++) {
+    if (part2Ids[t] != -1) {
+      modulus.add(part2Ids[t]);
+      leftover.add(computeLeftover(t, part2Ids[t]));
     }
   }
 
-  return timestamp;
+  productModulus = modulus[0];
+  for (int i = 1; i < modulus.length; i++) {
+    productModulus *= modulus[i];
+  }
+  for (int i = 0; i < modulus.length; i++) {
+    partModulus.add((productModulus / modulus[i]).floor());
+  }
+  for (int i = 0; i < modulus.length; i++) {
+    u.add(calculateU(partModulus[i], modulus[i]));
+  }
+
+  // solving the chinese remainder....
+
+  // X =0 (mod 17)
+  // X=2  (mod 13)
+  // X=3  (mod 19)
+  //
+  //
+  // Ni    ai.
+  //
+  // 17.    0.     247.         247u1 = 1 (mod 17) ==> doesn’t matter…
+  // 13.    2.     323.         323u2 = 1 (mod 13) ==> u2 == 6
+  // 19     3.     221.           221u3 = 1 (mod 19) ==> u3== 8
+  //
+  // X = (2)(323)(6).          +(3)(221)(8)
+
+  var rawsum = 0;
+  for (int i = 0; i < modulus.length; i++) {
+    rawsum = rawsum + (leftover[i] * partModulus[i] * u[i]);
+  }
+  // need to keep subtracting modulus from it, till smaller than modulus
+  rawsum = subtractModulus(rawsum, productModulus);
+  return rawsum;
 }
 
 int answer() {

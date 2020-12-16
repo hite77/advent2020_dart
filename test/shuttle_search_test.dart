@@ -43,5 +43,9 @@ void main() {
 
     readLine('1789,37,47,1889');
     expect(part2Answer(), 1202161486); // 1,202,161,486
+
+    readLine(
+        '19,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,523,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,17,13,x,x,x,x,x,x,x,x,x,x,29,x,853,x,x,x,x,x,37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,23');
+    expect(part2Answer(), 210612924879242);
   });
 }
