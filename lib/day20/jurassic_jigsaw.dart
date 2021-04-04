@@ -325,6 +325,13 @@ flipHorizontal(id) {
   pictures[id] = backwards;
 }
 
+changeState(int count, int id) {
+  rotateLeft(id);
+  if (count == 4 || count == 8) {
+    flipHorizontal(id);
+  }
+}
+
 containedIn(String side, id) {
   if ((side == grabBottom(id)) ||
       (side == (grabBottom(id).split('').reversed.join())) ||
@@ -359,29 +366,48 @@ int answer2() {
   List<int> row = [corners.first];
   var connected = connections[corners.first];
 
-  var bottomMatches = ((grabBottom(corners.first) == grabTop(connected[0])) ||
-      (grabBottom(corners.first) == grabTop(connected[1])));
-  var rightMatches = ((grabRight(corners.first) == grabLeft(connected[0])) ||
-      ((grabRight(corners.first) == grabLeft(connected[1]))));
-  while (!(bottomMatches && rightMatches)) {
-    while (!containedIn(grabBottom(corners.first), connected[0]) &&
-        !containedIn(grabRight(corners.first), connected[1])) {
-      print('rotate');
-      rotateLeft(corners.first);
+  // todo: don't know where 0, or 1 is.... is it right, or below?
+  // todo: find which square if below or right.
+  int rotateCorner = 0;
+  int square0 = 0;
+  int square1 = 0;
+
+  while (!notAlignedTopCorner(corners.first, connected[0], connected[1])) {
+    if (rotateCorner < 7) {
+      rotateCorner += 1;
+      changeState(rotateCorner, corners.first);
+    } else {
+      rotateCorner += 1;
+      changeState(rotateCorner, corners.first);
+      rotateCorner = 0;
+      if (square0 < 7) {
+        square0 += 1;
+        changeState(square0, connected[0]);
+      } else {
+        square0 += 0;
+        changeState(square0, connected[0]);
+        square0 = 0;
+        if (square1 < 7) {
+          square1 += 1;
+          changeState(square1, connected[1]);
+        } else {
+          square1 += 1;
+          changeState(square1, connected[1]);
+        }
+      }
     }
-    bottomMatches = ((grabBottom(corners.first) == grabTop(connected[0])) ||
-        (grabBottom(corners.first) == grabTop(connected[1])));
-    rightMatches = ((grabRight(corners.first) == grabLeft(connected[0])) ||
-        ((grabRight(corners.first) == grabLeft(connected[1]))));
-    if (!(bottomMatches && rightMatches)) {
-      flipHorizontal(corners.first);
-      bottomMatches = ((grabBottom(corners.first) == grabTop(connected[0])) ||
-          (grabBottom(corners.first) == grabTop(connected[1])));
-      rightMatches = ((grabRight(corners.first) == grabLeft(connected[0])) ||
-          ((grabRight(corners.first) == grabLeft(connected[1]))));
-      print('flip');
-    }
+    print(rotateCorner);
+    print(square0);
+    print(square1);
+    print(pictures[corners.first] +
+        pictures[connected[0]] +
+        pictures[connected[1]]);
   }
+
+  print('Aligned');
+  print(pictures[corners.first] +
+      pictures[connected[0]] +
+      pictures[connected[1]]);
 
   // I could find matches related to square.... and rotate them....
   // square above, should have bottom match...
@@ -392,6 +418,17 @@ int answer2() {
   // may have to rotate, and determine which are left/right/top/bottom
 
   // need to cut borders and fuse it together....
+}
+
+bool notAlignedTopCorner(corner, position1, position2) {
+  if ((grabBottom(corner) == grabTop(position1) &&
+          grabRight(corner) == grabLeft(position2)) ||
+      (grabBottom(corner) == grabTop(position1) &&
+          grabRight(corner) == grabLeft(position2))) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void main() async {
