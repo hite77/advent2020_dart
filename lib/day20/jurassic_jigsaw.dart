@@ -6,6 +6,7 @@ Map<int, List<String>> pictures = new Map();
 int currentId;
 List<String> currentMap = [];
 Map<int, List<int>> connections = new Map();
+List<List<int>> board = [];
 
 void readLine(String line) {
   // print('Line: $line');
@@ -73,6 +74,22 @@ void add(id1, id2) {
   }
   if (!connections[id2].contains(id1)) {
     connections[id2].add(id1);
+  }
+}
+
+bool compareEdgeToPiece(String side, int id) {
+  var top = pictures[id][0];
+  var bottom = pictures[id][9];
+  var left = grabLeft(id);
+  var right = grabRight(id);
+
+  if ((side == top || side == top.split('').reversed.join()) ||
+      (side == bottom || side == bottom.split('').reversed.join()) ||
+      (side == left || side == left.split('').reversed.join()) ||
+      (side == right || side == right.split('').reversed.join())) {
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -409,15 +426,81 @@ int answer2() {
       pictures[connected[0]] +
       pictures[connected[1]]);
 
+  // use connections to get list of connected matrixes...
+  // and check right edge...
+  // determine pieces and write to list till we have matrix size...
+
+  List<int> topRow = [corners.first];
+  if (grabRight(corners.first) == connected[0]) {
+    topRow.add(connected[0]);
+  } else {
+    topRow.add(connected[1]);
+  }
+
+  collectRow(topRow, corners);
+  board.add(topRow);
+
+  // create a new Row... find the piece below and call the function to move across....
+  // stop once bottom left is corner....
+
+  while (board.length == 1 || !corners.contains(board.last.first)) {
+    List<int> row = [];
+    connections[board.last.first].forEach((element) {
+      if (compareEdgeToPiece(grabBottom(board.last.first), element)) {
+        row.add(element);
+        rotateToMatchTop(grabBottom(board.last.first), element);
+        collectRow(row, corners);
+        board.add(row);
+      }
+    });
+  }
+
+  // find square that matches bottom.....
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   // I could find matches related to square.... and rotate them....
   // square above, should have bottom match...
   // bottom square move right, top square move right....
   // keep going till all squares assigned...
 
-  // Note: could build a map that indicates which id's touch....
-  // may have to rotate, and determine which are left/right/top/bottom
+  print('Board');
+  print(board);
 
   // need to cut borders and fuse it together....
+}
+
+void collectRow(List<int> row, List corners) {
+  int countAdded = 1;
+  while (countAdded > 0) {
+    countAdded = 0;
+    connections[row.last].forEach((element) {
+      if (compareEdgeToPiece(grabRight(row.last), element)) {
+        rotateToMatchRight(grabRight(row.last), element);
+        row.add(element);
+        countAdded += 1;
+      }
+    });
+  }
+}
+
+void rotateToMatchTop(String top, int element) {
+  int rotation = 0;
+  while (top != grabTop(element)) {
+    rotation += 1;
+    changeState(rotation, element);
+  }
+  print('rotation:');
+  print(rotation);
+}
+
+void rotateToMatchRight(String right, int element) {
+  int rotation = 0;
+  while (right != grabLeft(element)) {
+    rotation += 1;
+    changeState(rotation, element);
+  }
+  print('rotation:');
+  print(rotation);
 }
 
 bool notAlignedTopCorner(corner, position1, position2) {
