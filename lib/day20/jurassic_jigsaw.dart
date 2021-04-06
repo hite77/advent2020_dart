@@ -7,6 +7,7 @@ int currentId;
 List<String> currentMap = [];
 Map<int, List<int>> connections = new Map();
 List<List<int>> board = [];
+List<List<String>> screen = [];
 
 void readLine(String line) {
   // print('Line: $line');
@@ -228,8 +229,36 @@ int answer() {
   return answer;
 }
 
+//todo: need to rotate left... not sure if this works or not?
+rotateScreenLeft() {
+  List<List<String>> rotated = List.from(screen);
+  int size = rotated.length;
+  int current_position = 0;
+
+  // x=0, y=0         x=width y=0
+  // x=0, y=1                   x=width-1 y=0
+  while (current_position < size) {
+    for (var i = 0; i < size; i++) {
+      rotated[current_position][i] = screen[i][current_position];
+    }
+    current_position += 1;
+  }
+  screen = rotated;
+}
+
+flipScreenLeft() {
+  List<List<String>> flipped = List.from(screen);
+  for (var y = 0; y < flipped.length; y++) {
+    for (var x = 0; x < flipped.length; x++) {
+      flipped[y][x] = screen[y][flipped.length - 1 - x];
+    }
+  }
+  screen = flipped;
+}
+
 rotateLeft(id) {
   List<String> rotated = [];
+
   rotated.add(pictures[id][0].substring(9) +
       pictures[id][1].substring(9) +
       pictures[id][2].substring(9) +
@@ -349,6 +378,13 @@ changeState(int count, int id) {
   }
 }
 
+changeStateScreen(int count) {
+  rotateScreenLeft();
+  if (count == 4 || count == 8) {
+    flipScreenLeft();
+  }
+}
+
 containedIn(String side, id) {
   if ((side == grabBottom(id)) ||
       (side == (grabBottom(id).split('').reversed.join())) ||
@@ -364,14 +400,11 @@ containedIn(String side, id) {
 }
 
 int answer2() {
-  List corners = [];
-  List<List<int>> arrangements = [];
-  var currentx = 0;
-  var currenty = 0;
-  // var goingDown = true;
-  var squaresDone = 0;
-  var toBeDone = pictures.keys.length;
+  // tried 5060, and did not work...
+  // tried 2582 still too high....
+  // tried 2459 still too high....
 
+  List corners = [];
   pictures.keys.forEach((element) {
     if (findTwoSidesNonMatching(element)) {
       // print('element:$element is corner');
@@ -455,18 +488,141 @@ int answer2() {
     });
   }
 
-  // find square that matches bottom.....
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  // I could find matches related to square.... and rotate them....
-  // square above, should have bottom match...
-  // bottom square move right, top square move right....
-  // keep going till all squares assigned...
-
   print('Board');
   print(board);
 
   // need to cut borders and fuse it together....
+  // screen.add(['J','a','s','o','n']);
+  // screen[0][4] = 'J';
+  fillCells(board.first.length, board.length, screen);
+  // need to cut left, right, top bottom from pictures
+
+  pictures.keys.forEach((element) {
+    List<String> cut = [];
+    for (var y = 1; y < 9; y++) {
+      cut.add(pictures[element][y].substring(1, 9));
+    }
+    pictures[element] = cut;
+  });
+
+  for (var y = 0; y < board.length; y++) {
+    for (var x = 0; x < board.first.length; x++) {
+      copyCells(board[y][x], x, y);
+    }
+  }
+  print('screen:');
+  screen.forEach((element) {
+    print(element);
+  });
+
+  // looking for:
+
+  List<String> monster = [
+    '##################O#',
+    'O####OO####OO####OOO',
+    '#O##O##O##O##O##O###'
+  ];
+
+  //changeStateScreen 0--7 for state....
+  //take lowest count of counted # that are not sea monsters...
+
+  int position = 0;
+  int lowest = countMonster(monster);
+  while (position < 9) {
+    changeStateScreen(position);
+    int current = countMonster(monster);
+    if (current < lowest) {
+      lowest = current;
+    }
+    print('Screen');
+    screen.forEach((element) {
+      print(element);
+    });
+    // print(screen);
+    position += 1;
+  }
+  return lowest;
+}
+
+int countMonster(List<String> monster) {
+  int count = 0;
+  // convert monster to O -- then count # and return count....
+  for (var y = 0; y < (screen.length - monster.length); y++) {
+    for (var x = 0; x < (screen.first.length - monster.first.length); x++) {
+      bool foundAll = true;
+      for (var ymonster = 0; ymonster < monster.length; ymonster++) {
+        for (var xmonster = 0; xmonster < monster.first.length; xmonster++) {
+          if ((monster[ymonster][xmonster] == 'O' &&
+              (screen[y + ymonster][x + xmonster] == '#' ||
+                  screen[y + ymonster][x + xmonster] == 'O'))) {
+            foundAll = foundAll & true;
+          } else {
+            foundAll = false;
+          }
+        }
+      }
+      if (foundAll) {
+        for (var ymonster = 0; ymonster < monster.length; ymonster++) {
+          for (var xmonster = 0; xmonster < monster.first.length; xmonster++) {
+            if (monster[ymonster][xmonster] == 'O') {
+              screen[y + ymonster][x + xmonster] = 'O';
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (var y = 0; y < screen.length; y++) {
+    for (var x = 0; x < screen.first.length; x++) {
+      if (screen[y][x] == '#') {
+        count += 1;
+      }
+    }
+  }
+
+  // change O back to # at end
+  for (var y = 0; y < screen.length; y++) {
+    for (var x = 0; x < screen.first.length; x++) {
+      if (screen[y][x] == 'O') {
+        screen[y][x] = '#';
+      }
+    }
+  }
+  return count;
+}
+
+void fillCells(int widthEights, int heightEights, screen) {
+  for (var i = 1; i <= heightEights * 8; i++) {
+    List<String> empty = [];
+    for (var i = 1; i <= widthEights; i++) {
+      empty.add('1');
+      empty.add('2');
+      empty.add('3');
+      empty.add('4');
+      empty.add('5');
+      empty.add('6');
+      empty.add('7');
+      empty.add('8');
+    }
+    screen.add(empty);
+  }
+}
+
+void copyCells(int id, int offset_x, int offset_y) {
+  // pictures id --> x 0 --> 9, y 0 --> 9
+  // to screen offset offset_x*10 , offset_y*10 + x,y
+  for (var x = 0; x < 8; x++) {
+    for (var y = 0; y < 8; y++) {
+      if (x < 7) {
+        screen[(offset_y * 8) + y][(offset_x * 8) + x] =
+            pictures[id][y].substring(x, x + 1);
+      } else {
+        screen[(offset_y * 8) + y][(offset_x * 8) + x] =
+            pictures[id][y].substring(x);
+      }
+    }
+  }
 }
 
 void collectRow(List<int> row, List corners) {
