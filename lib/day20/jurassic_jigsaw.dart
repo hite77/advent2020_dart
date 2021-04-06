@@ -229,7 +229,6 @@ int answer() {
   return answer;
 }
 
-//todo: need to rotate left... not sure if this works or not?
 rotateScreenLeft() {
   List<List<String>> rotated =
       List.generate(screen.length, (i) => List(screen.length), growable: false);
