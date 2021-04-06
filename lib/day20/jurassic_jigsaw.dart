@@ -231,17 +231,24 @@ int answer() {
 
 //todo: need to rotate left... not sure if this works or not?
 rotateScreenLeft() {
-  List<List<String>> rotated = List.from(screen);
+  List<List<String>> rotated =
+      List.generate(screen.length, (i) => List(screen.length), growable: false);
   int size = rotated.length;
-  int current_position = 0;
+  // [current_position][i] = [][size-current_position]
+  // [0][0] = [0][2] = 2
+  // [0][1] = [1][2] = X
+  // [0][2] = [2][2] = 3
+  // [1][0] = [0][1]
+  // [1][1] = [1][1]
+  // [1][2] = [2][1]
+  // [2][0] = [0][0] = 1
+  // [2][1] = [1][0] = X
+  // [2][2] = [2][0] = 4
 
-  // x=0, y=0         x=width y=0
-  // x=0, y=1                   x=width-1 y=0
-  while (current_position < size) {
+  for (var current_position = 0; current_position < size; current_position++) {
     for (var i = 0; i < size; i++) {
-      rotated[current_position][i] = screen[i][current_position];
+      rotated[current_position][i] = screen[i][size - 1 - current_position];
     }
-    current_position += 1;
   }
   screen = rotated;
 }
@@ -403,6 +410,7 @@ int answer2() {
   // tried 5060, and did not work...
   // tried 2582 still too high....
   // tried 2459 still too high....
+  // correct: 2129
 
   List corners = [];
   pictures.keys.forEach((element) {

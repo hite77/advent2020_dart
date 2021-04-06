@@ -282,13 +282,19 @@ void main() {
     expect(compareEdgeToPiece('9234567890', 0), false);
   });
 
-  //todo: rewrite for screen rotate...
-  // test('handle any size for rotate', () {
-  //   List<String> pic = ['1X2', 'XXX', '4X3'];
-  //   pictures[0] = pic;
-  //   rotateLeft(0);
-  //   expect(pictures[0], ['2X3', 'XXX', '1X4']);
-  // });
+  test('handle any size for rotate', () {
+    screen = [
+      ['1', 'X', '2'],
+      ['X', 'X', 'X'],
+      ['4', 'X', '3']
+    ];
+    rotateScreenLeft();
+    expect(screen, [
+      ['2', 'X', '3'],
+      ['X', 'X', 'X'],
+      ['1', 'X', '4']
+    ]);
+  });
 
   test('handle any size for flip horizontal', () {
     List<String> pic = ['1X2', 'XXX', '4X3'];
