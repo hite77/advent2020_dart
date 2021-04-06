@@ -416,8 +416,6 @@ int answer2() {
   List<int> row = [corners.first];
   var connected = connections[corners.first];
 
-  // todo: don't know where 0, or 1 is.... is it right, or below?
-  // todo: find which square if below or right.
   int rotateCorner = 0;
   int square0 = 0;
   int square1 = 0;
@@ -446,22 +444,7 @@ int answer2() {
         }
       }
     }
-    print(rotateCorner);
-    print(square0);
-    print(square1);
-    print(pictures[corners.first] +
-        pictures[connected[0]] +
-        pictures[connected[1]]);
   }
-
-  print('Aligned');
-  print(pictures[corners.first] +
-      pictures[connected[0]] +
-      pictures[connected[1]]);
-
-  // use connections to get list of connected matrixes...
-  // and check right edge...
-  // determine pieces and write to list till we have matrix size...
 
   List<int> topRow = [corners.first];
   if (grabRight(corners.first) == connected[0]) {
@@ -472,9 +455,6 @@ int answer2() {
 
   collectRow(topRow, corners);
   board.add(topRow);
-
-  // create a new Row... find the piece below and call the function to move across....
-  // stop once bottom left is corner....
 
   while (board.length == 1 || !corners.contains(board.last.first)) {
     List<int> row = [];
@@ -492,8 +472,6 @@ int answer2() {
   print(board);
 
   // need to cut borders and fuse it together....
-  // screen.add(['J','a','s','o','n']);
-  // screen[0][4] = 'J';
   fillCells(board.first.length, board.length, screen);
   // need to cut left, right, top bottom from pictures
 
@@ -515,22 +493,11 @@ int answer2() {
     print(element);
   });
 
-  // looking for:
-
-  List<String> monster = [
-    '##################O#',
-    'O####OO####OO####OOO',
-    '#O##O##O##O##O##O###'
-  ];
-
-  //changeStateScreen 0--7 for state....
-  //take lowest count of counted # that are not sea monsters...
-
   int position = 0;
-  int lowest = countMonster(monster);
+  int lowest = countMonster();
   while (position < 9) {
     changeStateScreen(position);
-    int current = countMonster(monster);
+    int current = countMonster();
     if (current < lowest) {
       lowest = current;
     }
@@ -544,7 +511,13 @@ int answer2() {
   return lowest;
 }
 
-int countMonster(List<String> monster) {
+int countMonster() {
+  List<String> monster = [
+    '.#...#.###...#.##.O#',
+    'O.##.OO#.#.OO.##.OOO',
+    '#O.#O#.O##O..O.#O##.'
+  ];
+
   int count = 0;
   // convert monster to O -- then count # and return count....
   for (var y = 0; y < (screen.length - monster.length); y++) {
@@ -552,12 +525,13 @@ int countMonster(List<String> monster) {
       bool foundAll = true;
       for (var ymonster = 0; ymonster < monster.length; ymonster++) {
         for (var xmonster = 0; xmonster < monster.first.length; xmonster++) {
-          if ((monster[ymonster][xmonster] == 'O' &&
-              (screen[y + ymonster][x + xmonster] == '#' ||
-                  screen[y + ymonster][x + xmonster] == 'O'))) {
-            foundAll = foundAll & true;
-          } else {
-            foundAll = false;
+          if (monster[ymonster][xmonster] == 'O') {
+            if (screen[y + ymonster][x + xmonster] == '#' ||
+                screen[y + ymonster][x + xmonster] == 'O') {
+              foundAll = foundAll & true;
+            } else {
+              foundAll = false;
+            }
           }
         }
       }

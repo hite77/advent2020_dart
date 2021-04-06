@@ -7,6 +7,7 @@ void main() {
   setUp(() {
     pictures = new Map();
     board = [];
+    screen = [];
     pictures[2311] = [
       '..##.#..#.',
       '##..#.....',
@@ -281,22 +282,13 @@ void main() {
     expect(compareEdgeToPiece('9234567890', 0), false);
   });
 
-  //todo: look into finding and setting an area of ids.....
-
-  //todo: start rotating each of the pieces
-  //todo: compare left and right of two id's....
-  //todo: compare top and bottom
-
-  //todo: build the big grid with no borders
-
-  //todo: will need this to rotate left the large array
-  //todo: handle smaller and larger matrixes....
-  test('handle any size for rotate', () {
-    List<String> pic = ['1X2', 'XXX', '4X3'];
-    pictures[0] = pic;
-    rotateLeft(0);
-    expect(pictures[0], ['2X3', 'XXX', '1X4']);
-  });
+  //todo: rewrite for screen rotate...
+  // test('handle any size for rotate', () {
+  //   List<String> pic = ['1X2', 'XXX', '4X3'];
+  //   pictures[0] = pic;
+  //   rotateLeft(0);
+  //   expect(pictures[0], ['2X3', 'XXX', '1X4']);
+  // });
 
   test('handle any size for flip horizontal', () {
     List<String> pic = ['1X2', 'XXX', '4X3'];
@@ -347,6 +339,82 @@ void main() {
   //
   //   expect(screen, 'foo');
   // });
+
+  //todo: test that generating the board and rotating pieces....
+  //and rotating the whole board will result in the correct board....
+  //need to make sure that rotating over and over arrives at the board...
+  //Likely will need to separate methods and call them in test correctly.
+
+  test('count monster works', () {
+    // build List<String> and convert to List<List<String>>
+
+    List<String> temp = [
+      '.####...#####..#...###..',
+      '#####..#..#.#.####..#.#.',
+      '.#.#...#.###...#.##.##..',
+      '#.#.##.###.#.##.##.#####',
+      '..##.###.####..#.####.##',
+      '...#.#..##.##...#..#..##',
+      '#.##.#..#.#..#..##.#.#..',
+      '.###.##.....#...###.#...',
+      '#.####.#.#....##.#..#.#.',
+      '##...#..#....#..#...####',
+      '..#.##...###..#.#####..#',
+      '....#.##.#.#####....#...',
+      '..##.##.###.....#.##..#.',
+      '#...#...###..####....##.',
+      '.#.##...#.##.#.#.###...#',
+      '#.###.#..####...##..#...',
+      '#.###...#.##...#.######.',
+      '.###.###.#######..#####.',
+      '..##.#..#..#.#######.###',
+      '#.#..##.########..#..##.',
+      '#.#####..#.#...##..#....',
+      '#....##..#.#########..##',
+      '#...#.....#..##...###.##',
+      '#..###....##.#...##.##.#'
+    ];
+
+    screen = [];
+    temp.forEach((element) {
+      screen.add([
+        '#',
+        '.',
+        '.',
+        '#',
+        '#',
+        '#',
+        '.',
+        '.',
+        '.',
+        '.',
+        '#',
+        '#',
+        '.',
+        '#',
+        '.',
+        '.',
+        '.',
+        '#',
+        '#',
+        '.',
+        '#',
+        '#',
+        '.',
+        '#'
+      ]);
+    });
+    for (var y = 0; y < temp.length; y++) {
+      for (var x = 0; x < temp[y].length; x++) {
+        if (x < temp[y].length - 1) {
+          screen[y][x] = temp[y].substring(x, x + 1);
+        } else {
+          screen[y][x] = temp[y].substring(x);
+        }
+      }
+    }
+    expect(countMonster(), 273);
+  });
 
   test('answer2 will build up the board', () {
     int answer = answer2();
