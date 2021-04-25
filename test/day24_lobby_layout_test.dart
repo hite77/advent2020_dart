@@ -30,6 +30,63 @@ void main() {
     readLine('nenwswse');
     expect(coords.first.x, 0);
     expect(coords.first.y, 0);
+    expect(coords.first.z, 0);
+  });
+
+  test('move ne', () {
+    readLine('ne');
+    expect(coords.first.x, 1);
+    expect(coords.first.y, 0);
+    expect(coords.first.z, -1);
+  });
+
+  test('move nw', () {
+    readLine('nw');
+    expect(coords.first.x, 0);
+    expect(coords.first.y, 1);
+    expect(coords.first.z, -1);
+  });
+
+  test('move w', () {
+    readLine('w');
+    expect(coords.first.x, -1);
+    expect(coords.first.y, 1);
+    expect(coords.first.z, 0);
+  });
+
+  test('move sw', () {
+    readLine('sw');
+    expect(coords.first.x, -1);
+    expect(coords.first.y, 0);
+    expect(coords.first.z, 1);
+  });
+
+  test('move sw', () {
+    readLine('se');
+    expect(coords.first.x, 0);
+    expect(coords.first.y, -1);
+    expect(coords.first.z, 1);
+  });
+
+  test('move e', () {
+    readLine('e');
+    expect(coords.first.x, 1);
+    expect(coords.first.y, -1);
+    expect(coords.first.z, 0);
+  });
+
+  test('calculate extents', () {
+    coord first = new coord(-15, 23, 13);
+    coord second = new coord(-43, -99, -23);
+
+    extents actual = calculateArea([first, second]);
+
+    expect(actual.minx, -45);
+    expect(actual.maxx, -13);
+    expect(actual.miny, -101);
+    expect(actual.maxy, 25);
+    expect(actual.minz, -25);
+    expect(actual.maxz, 15);
   });
 
   test('Example', () {
@@ -54,7 +111,6 @@ void main() {
     readLine('neswnwewnwnwseenwseesewsenwsweewe');
     readLine('wseweeenwnesenwwwswnew');
     expect(answer(), 10);
-    expect(answer2(), 2208);
     expect(day(1), 15);
     expect(day(2), 12);
     expect(day(3), 25);
@@ -74,5 +130,6 @@ void main() {
     expect(day(80), 1373);
     expect(day(90), 1844);
     expect(day(100), 2208);
+    expect(answer2(), 2208);
   });
 }

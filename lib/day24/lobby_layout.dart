@@ -2,20 +2,29 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 
-class coord {
-  int x = 0, y = 0;
-
-  bool operator ==(o) => o is coord && o.x == x && o.y == y;
+class extents {
+  int minx, maxx, miny, maxy, minz, maxz;
 }
 
-//coords are tiles that are white
+class coord {
+  int x;
+  int y;
+  int z;
+
+  coord(int x, int y, int z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  bool operator ==(o) => o.x == x && o.y == y && o.z == z;
+}
+
 List<coord> coords = [];
 
 //e, se, sw, w, nw, and ne
 readLine(String line) {
-  coord current = new coord();
-  current.x = 0;
-  current.y = 0;
+  coord current = new coord(0, 0, 0);
   while (line.isNotEmpty) {
     //check if character is e or w
     String direction = line.substring(0, 1);
@@ -28,25 +37,25 @@ readLine(String line) {
     // use direction to move coords
     // e, se, sw, w, nw, and ne
     if (direction == 'e') {
-      current.x = current.x + 2;
-    } else if (direction == 'se') {
       current.x = current.x + 1;
-      current.y = current.y + 1;
+      current.y = current.y - 1;
+    } else if (direction == 'se') {
+      current.z = current.z + 1;
+      current.y = current.y - 1;
     } else if (direction == 'sw') {
       current.x = current.x - 1;
-      current.y = current.y + 1;
+      current.z = current.z + 1;
     } else if (direction == 'w') {
-      current.x = current.x - 2;
-    } else if (direction == 'nw') {
       current.x = current.x - 1;
-      current.y = current.y - 1;
+      current.y = current.y + 1;
+    } else if (direction == 'nw') {
+      current.z = current.z - 1;
+      current.y = current.y + 1;
     } else if (direction == 'ne') {
       current.x = current.x + 1;
-      current.y = current.y - 1;
+      current.z = current.z - 1;
     }
   }
-  // check if coordinate in first
-  // print('coord: ${current.x} , ${current.y}');
   if (coords.contains(current)) {
     coords.remove(current);
   } else {
@@ -58,17 +67,126 @@ int answer() {
   return coords.length;
 }
 
-int day(int d) {
-  return 42;
+int countAround(coord position, List<coord> black) {
+  // return count of black (in list) around position.
+  int count = 0;
+  if (black.contains(new coord(position.x, position.y + 1, position.z - 1))) {
+    count += 1;
+  }
+  if (black.contains(new coord(position.x - 1, position.y + 1, position.z))) {
+    count += 1;
+  }
+  if (black.contains(new coord(position.x - 1, position.y, position.z + 1))) {
+    count += 1;
+  }
+  if (black.contains(new coord(position.x, position.y - 1, position.z + 1))) {
+    count += 1;
+  }
+  if (black.contains(new coord(position.x + 1, position.y - 1, position.z))) {
+    count += 1;
+  }
+  if (black.contains(new coord(position.x + 1, position.y, position.z - 1))) {
+    count += 1;
+  }
+  return count;
 }
 
-String answer2() {
-  // Any black tile with zero or more than 2 black tiles immediately adjacent to it is flipped to white.
-  // Any white tile with exactly 2 black tiles immediately adjacent to it is flipped to black.
+extents calculateArea(List<coord> before) {
+  int minx = (before.first).x;
+  int maxx = (before.first).x;
+  int miny = (before.first).y;
+  int maxy = (before.first).y;
+  int minz = (before.first).z;
+  int maxz = (before.first).z;
 
-  // 100 days...
+  before.forEach((coord element) {
+    if (element.x < minx) {
+      minx = element.x;
+    }
+    if (element.x > maxx) {
+      maxx = element.x;
+    }
+    if (element.y < miny) {
+      miny = element.y;
+    }
+    if (element.y > maxy) {
+      maxy = element.y;
+    }
+    if (element.z < minz) {
+      minz = element.z;
+    }
+    if (element.z > maxz) {
+      maxz = element.z;
+    }
+  });
 
-  return 'bar';
+  minx -= 2;
+  maxx += 2;
+  miny -= 2;
+  maxy += 2;
+  minz -= 2;
+  maxz += 2;
+
+  extents extent = new extents();
+  extent.minx = minx;
+  extent.maxx = maxx;
+  extent.miny = miny;
+  extent.maxy = maxy;
+  extent.minz = minz;
+  extent.maxz = maxz;
+  return extent;
+}
+
+int day(int d) {
+  List<coord> before = [];
+  List<coord> after = [];
+  int count = 0;
+
+  coords.forEach((element) {
+    before.add(element);
+  });
+
+  for (var dayCounter = 0; dayCounter < d; dayCounter++) {
+    extents border = calculateArea(before);
+
+    for (var x = border.minx; x <= border.maxx; x++) {
+      for (var y = border.miny; y <= border.maxy; y++) {
+        for (var z = border.minz; z <= border.maxz; z++) {
+          coord currentPosition = new coord(x, y, z);
+          var currentCount = countAround(currentPosition, before);
+          // determine black or white...
+          if (before.contains(currentPosition)) {
+            // black
+            if ((currentCount == 1) || (currentCount == 2)) {
+              after.add(currentPosition);
+            }
+          } else {
+            // white
+            if (currentCount == 2) {
+              // becomes black, if white it will remain white with nothing required
+              after.add(currentPosition);
+            }
+          }
+        }
+      }
+    }
+
+    // flip after to before, and get count
+    // and keep clicking days
+    before = [];
+    count = 0;
+    after.forEach((element) {
+      before.add(element);
+      count += 1;
+    });
+    after = [];
+  }
+  return count;
+}
+
+int answer2() {
+  // 4205 is wrong answer
+  return day(100);
 }
 
 void main() async {
